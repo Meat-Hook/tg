@@ -66,7 +66,7 @@ func makeRequest(ctx context.Context, token, method string, client *http.Client,
 
 	buf, err := json.Marshal(body)
 	if err != nil {
-		return fmt.Errorf("json marhal: %w", err)
+		return fmt.Errorf("json marshal: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint.String(), bytes.NewBuffer(buf))
