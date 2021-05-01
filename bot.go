@@ -15,15 +15,30 @@ const (
 
 // endpoints
 const (
-	selfData = "getMe"
+	selfData   = "getMe"
+	getUpdates = "getUpdates"
 )
 
-// Bot allows you to interact with the Telegram Bot API.
-type Bot struct {
-	token  string
-	client *http.Client
-	info   User
-}
+type (
+	// Bot allows you to interact with the Telegram Bot API.
+	Bot struct {
+		token  string
+		client *http.Client
+		info   User
+	}
+	// Contains data from the Telegram API with the result.
+	response struct {
+		Ok          bool                `json:"ok"`
+		Result      json.RawMessage     `json:"result"`
+		ErrorCode   int                 `json:"error_code"`
+		Description string              `json:"description"`
+		Parameters  *responseParameters `json:"parameters"`
+	}
+	responseParameters struct {
+		MigrateToChatID int64 `json:"migrate_to_chat_id"` // optional
+		RetryAfter      int   `json:"retry_after"`        // optional
+	}
+)
 
 // Info returns Bot information.
 func (b *Bot) Info() User {
@@ -48,7 +63,7 @@ func NewBot(ctx context.Context, token string) (*Bot, error) {
 
 func (b *Bot) init(ctx context.Context) error {
 	u := User{}
-	err := makeRequest(ctx, b.token, selfData, b.client, nil, &u)
+	err := b.makeRequest(ctx, selfData, nil, &u)
 	if err != nil {
 		return fmt.Errorf("make request: %w", err)
 	}
@@ -58,8 +73,8 @@ func (b *Bot) init(ctx context.Context) error {
 	return nil
 }
 
-func makeRequest(ctx context.Context, token, method string, client *http.Client, body interface{}, unmarshal interface{}) error {
-	endpoint, err := url.Parse(fmt.Sprintf("%s/%s/%s", apiURL, fmt.Sprintf("bot%s", token), method))
+func (b *Bot) makeRequest(ctx context.Context, method string, body interface{}, unmarshal interface{}) error {
+	endpoint, err := url.Parse(fmt.Sprintf("%s/%s/%s", apiURL, fmt.Sprintf("bot%s", b.token), method))
 	if err != nil {
 		return fmt.Errorf("build url: %w", err)
 	}
@@ -75,7 +90,7 @@ func makeRequest(ctx context.Context, token, method string, client *http.Client,
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	res, err := client.Do(req)
+	res, err := b.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("client do: %w", err)
 	}
