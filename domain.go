@@ -16,6 +16,15 @@ type (
 		LanguageCode string `json:"language_code"`
 		// IsBot true, if this user is a bot.
 		IsBot bool `json:"is_bot"`
+		// CanJoinGroups true, if the bot can be invited to groups.
+		// Returned only in getMe.
+		CanJoinGroups bool `json:"can_join_groups"`
+		// CanReadAllGroupMessages true, if privacy mode is disabled for the bot.
+		// Returned only in getMe.
+		CanReadAllGroupMessages bool `json:"can_read_all_group_messages"`
+		// SupportsInlineQueries true, if the bot supports inline queries.
+		// Returned only in getMe.
+		SupportsInlineQueries bool `json:"supports_inline_queries"`
 	}
 	// ChatPhoto this object represents a chat photo.
 	ChatPhoto struct {
