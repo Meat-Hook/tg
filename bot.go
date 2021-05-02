@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/Meat-Hook/tg/domain"
 )
 
 const (
@@ -24,7 +26,7 @@ type (
 	Bot struct {
 		token  string
 		client *http.Client
-		info   User
+		info   domain.User
 	}
 	// Contains data from the Telegram API with the result.
 	response struct {
@@ -41,7 +43,7 @@ type (
 )
 
 // Info returns Bot information.
-func (b *Bot) Info() User {
+func (b *Bot) Info() domain.User {
 	return b.info
 }
 
@@ -50,7 +52,7 @@ func NewBot(ctx context.Context, token string) (*Bot, error) {
 	b := &Bot{
 		token:  token,
 		client: &http.Client{}, // TODO: Add custom client.
-		info:   User{},
+		info:   domain.User{},
 	}
 
 	err := b.init(ctx)
@@ -62,7 +64,7 @@ func NewBot(ctx context.Context, token string) (*Bot, error) {
 }
 
 func (b *Bot) init(ctx context.Context) error {
-	u := User{}
+	u := domain.User{}
 	err := b.makeRequest(ctx, selfData, nil, &u)
 	if err != nil {
 		return fmt.Errorf("make request: %w", err)
