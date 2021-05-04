@@ -15,5 +15,5 @@ type KeyboardButton struct {
 	RequestLocation bool `json:"request_location"`
 	// RequestPoll if specified, the user will be asked to create a poll and send it to the bot when the button is pressed.
 	// Available in private chats only
-	RequestPoll KeyboardButtonPollType `json:"request_poll"`
+	RequestPoll *KeyboardButtonPollType `json:"request_poll,omitempty"`
 }
