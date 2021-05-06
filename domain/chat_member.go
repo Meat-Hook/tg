@@ -21,6 +21,16 @@ var (
 // ChatMemberKind enum.
 type ChatMemberKind uint8
 
+const (
+	_             ChatMemberKind = iota
+	Creator                      // creator
+	Administrator                // administrator
+	Member                       // member
+	Restricted                   // restricted
+	Left                         // left
+	Kicked                       // kicked
+)
+
 // UnmarshalJSON implements json.Unmarshaler.
 func (i *ChatMemberKind) UnmarshalJSON(bytes []byte) error {
 	str := string(bytes)
@@ -52,16 +62,6 @@ func (i *ChatMemberKind) UnmarshalJSON(bytes []byte) error {
 func (i ChatMemberKind) MarshalJSON() ([]byte, error) {
 	return []byte(i.String()), nil
 }
-
-const (
-	_             ChatMemberKind = iota
-	Creator                      // creator
-	Administrator                // administrator
-	Member                       // member
-	Restricted                   // restricted
-	Left                         // left
-	Kicked                       // kicked
-)
 
 // ChatMember this object contains information about one member of a chat.
 type ChatMember struct {

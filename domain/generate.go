@@ -1,3 +1,3 @@
 package domain
 
-//go:generate stringer -type=ChatMemberKind -output stringer.go -linecomment
+//go:generate stringer -type=ChatMemberKind,ChatType -output stringer.go -linecomment
