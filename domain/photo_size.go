@@ -1,17 +1,18 @@
 package domain
 
-// PhotoSize this object represents one size of a photo or a file / sticker thumbnail.
+// PhotoSize This object represents one size of a photo or a file / sticker thumbnail.
 type PhotoSize struct {
-	// FileID identifier for this file, which can be used to download or reuse the file.
-	FileID string `json:"file_id"`
-	// FileUniqueID unique identifier for this file,
-	// which is supposed to be the same over time and for different bots.
+	// Identifier for this file, which can be used to download or reuse the file.
+	FileId string `json:"file_id"`
+	// Unique identifier for this file, which is supposed to be the same over time and for different bots.
 	// Can't be used to download or reuse the file.
-	FileUniqueID string `json:"file_unique_id"`
-	// Width photo width.
+	FileUniqueId string `json:"file_unique_id"`
+	// Photo width.
 	Width int `json:"width"`
-	// Height photo height.
+	// Photo height.
 	Height int `json:"height"`
-	// FileSize file size.
+	// File size.
+	//
+	// Optional.
 	FileSize int `json:"file_size"`
 }

@@ -67,7 +67,7 @@ func (b *Bot) init(ctx context.Context) error {
 	u := domain.User{}
 	err := b.makeRequest(ctx, selfData, nil, &u)
 	if err != nil {
-		return fmt.Errorf("make request: %w", err)
+		return fmt.Errorf("b.makeRequest: %w", err)
 	}
 
 	b.info = u
@@ -75,33 +75,39 @@ func (b *Bot) init(ctx context.Context) error {
 	return nil
 }
 
-func (b *Bot) makeRequest(ctx context.Context, method string, body interface{}, unmarshal interface{}) error {
+func (b *Bot) makeRequest(ctx context.Context, method string, body interface{}, unmarshal interface{}) (err error) {
 	endpoint, err := url.Parse(fmt.Sprintf("%s/%s/%s", apiURL, fmt.Sprintf("bot%s", b.token), method))
 	if err != nil {
-		return fmt.Errorf("build url: %w", err)
+		return fmt.Errorf("url.Parse: %w", err)
 	}
 
 	buf, err := json.Marshal(body)
 	if err != nil {
-		return fmt.Errorf("json marshal: %w", err)
+		return fmt.Errorf("json.Marshal: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint.String(), bytes.NewBuffer(buf))
 	if err != nil {
-		return fmt.Errorf("build req: %w", err)
+		return fmt.Errorf("http.NewRequestWithContext: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	res, err := b.client.Do(req)
 	if err != nil {
-		return fmt.Errorf("client do: %w", err)
+		return fmt.Errorf("b.client.Do: %w", err)
 	}
 	defer res.Body.Close() // TODO: Add error handler.
+	defer func() {
+		closeErr := res.Body.Close()
+		if closeErr != nil {
+			err = fmt.Errorf("%w: %s", err, closeErr)
+		}
+	}()
 
 	r := &response{}
 	err = json.NewDecoder(res.Body).Decode(r)
 	if err != nil {
-		return fmt.Errorf("json decode: %w", err)
+		return fmt.Errorf("json.NewDecoder(res.Body).Decode: %w", err)
 	}
 
 	if !r.Ok {
