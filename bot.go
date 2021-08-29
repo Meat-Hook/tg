@@ -15,12 +15,6 @@ const (
 	apiURL = "https://api.telegram.org"
 )
 
-// endpoints
-const (
-	selfData   = "getMe"
-	getUpdates = "getUpdates"
-)
-
 type (
 	// Bot allows you to interact with the Telegram Bot API.
 	Bot struct {
@@ -49,34 +43,25 @@ func (b *Bot) Info() domain.User {
 
 // NewBot returns new Bot instance.
 func NewBot(ctx context.Context, token string) (*Bot, error) {
-	b := &Bot{
-		token:  token,
-		client: &http.Client{}, // TODO: Add custom client.
-		info:   domain.User{},
+	client := &http.Client{}
+	botInfo := domain.User{}
+
+	err := makeRequest(ctx, client, getMe, token, nil, &botInfo)
+	if err != nil {
+		return nil, fmt.Errorf("makeRequest: %w", err)
 	}
 
-	err := b.init(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("init bot: %w", err)
+	b := &Bot{
+		token:  token,
+		client: client, // TODO: Add custom client.
+		info:   botInfo,
 	}
 
 	return b, nil
 }
 
-func (b *Bot) init(ctx context.Context) error {
-	u := domain.User{}
-	err := b.makeRequest(ctx, selfData, nil, &u)
-	if err != nil {
-		return fmt.Errorf("b.makeRequest: %w", err)
-	}
-
-	b.info = u
-
-	return nil
-}
-
-func (b *Bot) makeRequest(ctx context.Context, method string, body interface{}, unmarshal interface{}) (err error) {
-	endpoint, err := url.Parse(fmt.Sprintf("%s/%s/%s", apiURL, fmt.Sprintf("bot%s", b.token), method))
+func makeRequest(ctx context.Context, client *http.Client, method, token string, body interface{}, unmarshal interface{}) (err error) {
+	endpoint, err := url.Parse(fmt.Sprintf("%s/%s/%s", apiURL, fmt.Sprintf("bot%s", token), method))
 	if err != nil {
 		return fmt.Errorf("url.Parse: %w", err)
 	}
@@ -92,11 +77,10 @@ func (b *Bot) makeRequest(ctx context.Context, method string, body interface{}, 
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	res, err := b.client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("b.client.Do: %w", err)
 	}
-	defer res.Body.Close() // TODO: Add error handler.
 	defer func() {
 		closeErr := res.Body.Close()
 		if closeErr != nil {
@@ -111,7 +95,7 @@ func (b *Bot) makeRequest(ctx context.Context, method string, body interface{}, 
 	}
 
 	if !r.Ok {
-		return fmt.Errorf("%s", r.Description)
+		return fmt.Errorf("r.Description: %s", r.Description)
 	}
 
 	return json.Unmarshal(r.Result, unmarshal)

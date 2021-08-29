@@ -13,3 +13,5 @@ type ReplyKeyboardRemove struct {
 	// Optional.
 	Selective bool `json:"selective"`
 }
+
+func (r ReplyKeyboardRemove) isChatMember() {}

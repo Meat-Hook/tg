@@ -27,3 +27,5 @@ type ReplyKeyboardMarkup struct {
 	// Optional.
 	Selective bool `json:"selective"`
 }
+
+func (r ReplyKeyboardMarkup) isChatMember() {}

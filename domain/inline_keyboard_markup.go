@@ -7,3 +7,5 @@ type InlineKeyboardMarkup struct {
 	// Array of button rows, each represented by an Array of InlineKeyboardButton objects.
 	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
 }
+
+func (i InlineKeyboardMarkup) isChatMember() {}
